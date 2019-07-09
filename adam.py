@@ -1,13 +1,11 @@
 import math
 import torch
 from .optimizer import Optimizer
-
+import stochround
 
 class Adam(Optimizer):
     r"""Implements Adam algorithm.
-
     It has been proposed in `Adam: A Method for Stochastic Optimization`_.
-
     Arguments:
         params (iterable): iterable of parameters to optimize or dicts defining
             parameter groups
@@ -20,7 +18,6 @@ class Adam(Optimizer):
         amsgrad (boolean, optional): whether to use the AMSGrad variant of this
             algorithm from the paper `On the Convergence of Adam and Beyond`_
             (default: False)
-
     .. _Adam\: A Method for Stochastic Optimization:
         https://arxiv.org/abs/1412.6980
     .. _On the Convergence of Adam and Beyond:
@@ -48,7 +45,6 @@ class Adam(Optimizer):
 
     def step(self, closure=None):
         """Performs a single optimization step.
-
         Arguments:
             closure (callable, optional): A closure that reevaluates the model
                 and returns the loss.
@@ -56,7 +52,7 @@ class Adam(Optimizer):
         loss = None
         if closure is not None:
             loss = closure()
-
+        
         for group in self.param_groups:
             for p in group['params']:
                 if p.grad is None:
@@ -105,5 +101,18 @@ class Adam(Optimizer):
                 step_size = group['lr'] * math.sqrt(bias_correction2) / bias_correction1
 
                 p.data.addcdiv_(-step_size, exp_avg, denom)
+
+
+
+            for param in group['params']:
+                stochround.stochastic_tensor_round(param, param)
+                param_state=self.state[param]
+                if len(param_state) !=0:
+                    exp_avg, exp_avg_sq = param_state['exp_avg'], param_state['exp_avg_sq']
+                    if group['amsgrad']:
+                        max_exp_avg_sq = param_state['max_exp_avg_sq']
+                        stochround.stochastic_tensor_round(max_exp_avg_sq,max_exp_avg_sq)
+                    stochround.stochastic_tensor_round(exp_avg,exp_avg)
+                    stochround.stochastic_tensor_round(exp_avg_sq,exp_avg_sq)
 
         return loss
