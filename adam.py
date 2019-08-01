@@ -173,12 +173,12 @@ class Adam(Optimizer):
                         max_exp_avg_sq = param_state['max_exp_avg_sq']
                         stochround.stochastic_tensor_round(max_exp_avg_sq,max_exp_avg_sq)
                     
-                    exp_avg=exp_avg/10000
-                    exp_avg_sq=exp_avg_sq/10000
+                    #exp_avg=exp_avg/10000
+                    #exp_avg_sq=exp_avg_sq/10000
                     stochround.stochastic_tensor_round(exp_avg,exp_avg)
                     stochround.stochastic_tensor_round(exp_avg_sq,exp_avg_sq)
-                    exp_avg=exp_avg*10000
-                    exp_avg_sq=exp_avg_sq*10000
+                    #exp_avg=exp_avg*10000
+                    #exp_avg_sq=exp_avg_sq*10000
             # for param in group['params']:
             #     state=self.state[param]
             #     exp_avg, exp_avg_sq = state['exp_avg'], state['exp_avg_sq']
