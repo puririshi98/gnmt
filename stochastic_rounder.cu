@@ -39,6 +39,10 @@ __device__ __forceinline__ float get_delta_fp16(float x){
 }
 template <typename scalar_t>
 __device__ __forceinline__ scalar_t natalia_magic(float x,curandStatePhilox4_32_10_t state){
+	if(x==0.0){
+
+		return scalar_t(0.0);
+	}
 	float delta=get_delta_fp16(x);
 	
 	float randy=curand_uniform(&state);
