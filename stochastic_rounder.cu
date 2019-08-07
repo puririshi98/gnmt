@@ -39,16 +39,22 @@ __device__ __forceinline__ float get_delta_fp16(float x){
 }
 template <typename scalar_t>
 __device__ __forceinline__ scalar_t natalia_magic(float x,curandStatePhilox4_32_10_t state){
-// 	if(x==0.0){
+ 	if(x==0.0){
 
-// 		return scalar_t(0.0);
-// 	}
+ 		return scalar_t(0.0);
+ 	}
 	float delta=get_delta_fp16(x);
 	
 	float randy=curand_uniform(&state);
-	float val=x+randy*delta;
+	float val;
+	if(x<0.0){
+	    val=x-randy*delta;
+	}
+	else{
+	    val=x+randy*delta;
+	}
 	// To guarantee representability, route through a guaranteed FP16 cast.
-	return maybe_upcast<scalar_t>(__float2half_rd(val));
+	return maybe_upcast<scalar_t>(__float2half_rz(val));
 }
 
 template <typename scalar_t>
